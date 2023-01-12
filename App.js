@@ -12,10 +12,12 @@ export default function App() {
   const [location, setLocation] = useState();
   const [ok, setOk] = useState(true);
   const ask = async () => {
-    const { granted } = await Location.requestForegroundPermissionsAsync();
+    const { granted } = await Location.requestForegroundPermissionsAsync(); //Foreground 는 앱 사용중에만 작동하는것.
     if (!granted) {
+      // 유저가 위치를 추적을 허용하였는지 여부 확인 기능.
       setOk(false);
     }
+    // 유저 위치 확인하기.
     const {
       coords: { latitude, longitude },
     } = await Location.getCurrentPositionAsync({ accuracy: 5 });
