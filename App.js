@@ -1,15 +1,38 @@
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, View, Dimensions } from "react-native";
+import * as Location from "expo-location";
 
 //const SCREEN_WIDTH  = Dimensions.get("window").width; 는 아래와 같다. es6 문법.
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-console.log(SCREEN_WIDTH);
+// console.log(SCREEN_WIDTH);
 
 export default function App() {
+  const [city, setCity] = useState("Loading...");
+  const [location, setLocation] = useState();
+  const [ok, setOk] = useState(true);
+  const ask = async () => {
+    const { granted } = await Location.requestForegroundPermissionsAsync();
+    if (!granted) {
+      setOk(false);
+    }
+    const {
+      coords: { latitude, longitude },
+    } = await Location.getCurrentPositionAsync({ accuracy: 5 });
+    const location = await Location.reverseGeocodeAsync(
+      { latitude, longitude },
+      { useGoogleMaps: false }
+    );
+    console.log(location[0].city);
+    setCity(location[0].city);
+  };
+  useEffect(() => {
+    ask();
+  });
   return (
     <View style={styles.container}>
       <View style={styles.city}>
-        <Text style={styles.cityName}>Seoul</Text>
+        <Text style={styles.cityName}>{city}</Text>
       </View>
       <ScrollView
         pagingEnabled // 페이지 넘기면 멈춤 효과
@@ -19,7 +42,7 @@ export default function App() {
         contentContainerStyle={styles.weather}
       >
         <View style={styles.day}>
-          <Text style={styles.temp}>10</Text>
+          <Text style={styles.temp}>11</Text>
           <Text style={styles.description}>Sunny</Text>
         </View>
         <View style={styles.day}>
@@ -46,8 +69,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cityName: {
-    fontSize: 68,
+    fontSize: 58,
     fontWeight: "600",
+    marginTop: 30,
   },
   weather: {
     backgroundColor: "#fbc531",
