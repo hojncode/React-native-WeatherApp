@@ -9,8 +9,19 @@ import {
   ActivityIndicator,
 } from "react-native";
 import * as Location from "expo-location";
+import { Fontisto } from "@expo/vector-icons";
 
-const API_KEY = "784ab24ff2ed5d94d4288abed9e25d13";
+const API_KEY = "";
+
+const icons = {
+  Clouds: "cloud",
+  Clear: "day-sunny",
+  Atmosphere: "cloudy-gusts",
+  Snow: "snowflake",
+  Rain: "rains",
+  Drizzle: "rain",
+  Thunderstorm: "lightning",
+};
 
 //const SCREEN_WIDTH  = Dimensions.get("window").width; 는 아래와 같다. es6 문법.
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -36,10 +47,11 @@ export default function App() {
     // console.log(location[0].city);
     setCity(location[0].city);
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}&units=metric`
+      `https://openweathermap.org/data/2.5/oncall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}&units=metric`
     );
     const json = await response.json();
     setDays(json.daily);
+    console.log(json);
   };
   useEffect(() => {
     getWeather();
@@ -56,8 +68,8 @@ export default function App() {
         indicatorStyle={"white"} // 스크롤 바 색상 설정, ios만 적용 (안드로이드는 persistentScrollbar를 써야함 - 상황에 맞춰 골라 쓸 수 있는 법을 익히자)
         contentContainerStyle={styles.weather}
       >
-        {days.length === 0 ? (
-          <View style={styles.day}>
+        {days?.length === 0 ? (
+          <View style={{ ...styles.day, alignItems: "center" }}>
             <ActivityIndicator
               color="white"
               style={{ marginTop: 100 }}
@@ -65,16 +77,35 @@ export default function App() {
             />
           </View>
         ) : (
-          days.map((day, index) => (
+          days?.map((day, index) => (
             <View key={index} style={styles.day}>
-              <Text style={styles.temp}>
-                {parseFloat(day.temp.day).toFixed(1)}
+              <Text style={styles.dateInfo}>
+                {new Date(day.dt * 1000).toString().substring(0, 10)}
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <Text style={styles.temp}>
+                  {parseFloat(day.temp.day).toFixed(1)}
+                </Text>
+                <Fontisto
+                  name={day.weather[0].main}
+                  size={68}
+                  color="#e1b12c"
+                />
+              </View>
+              <Text style={styles.nightTemp}>
+                Night({parseFloat(day.feels_like.night).toFixed(1)})
               </Text>
               <Text style={styles.description}>{day.weather[0].main}</Text>
               <Text style={styles.tinyText}>
                 -{day.weather[0].description}-
               </Text>
-              <Text>Night({parseFloat(day.feels_like.night).toFixed(1)})</Text>
             </View>
           ))
         )}
@@ -88,12 +119,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#e1b12c",
   },
+  dateInfo: {
+    marginTop: 20,
+    flex: 0.3,
+    fontSize: 56,
+    marginBottom: 0,
+    color: "#e1b12c",
+    fontWeight: "800",
+  },
   city: {
     flex: 0.3,
     justifyContent: "center",
     alignItems: "center",
   },
   cityName: {
+    color: "#fbc531",
     fontSize: 58,
     fontWeight: "600",
     marginTop: 30,
@@ -106,12 +146,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   temp: {
-    marginTop: 50,
+    color: "#2f3640",
+    marginTop: 0,
     fontSize: 178,
   },
+  nightTemp: {
+    color: "#273c75",
+    fontSize: 25,
+    fontWeight: "200",
+    marginTop: -20,
+  },
   description: {
-    marginTop: -30,
-    fontSize: 60,
+    color: "#353b48",
+    marginTop: 0,
+    fontSize: 50,
+    fontWeight: "300",
   },
   tinyText: {
     color: "#273c75",
