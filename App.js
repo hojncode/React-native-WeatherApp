@@ -11,10 +11,10 @@ import {
 import * as Location from "expo-location";
 import { Fontisto } from "@expo/vector-icons";
 
-const API_KEY = "";
+const API_KEY = "784ab24ff2ed5d94d4288abed9e25d13";
 
 const icons = {
-  Clouds: "cloud",
+  Clouds: "cloudy",
   Clear: "day-sunny",
   Atmosphere: "cloudy-gusts",
   Snow: "snowflake",
@@ -45,9 +45,9 @@ export default function App() {
       { useGoogleMaps: false }
     );
     // console.log(location[0].city);
-    setCity(location[0].city);
+    setCity(location[0].city.slice(0, 2));
     const response = await fetch(
-      `https://openweathermap.org/data/2.5/oncall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}&units=metric`
+      `https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric&lang=kr`
     );
     const json = await response.json();
     setDays(json.daily);
@@ -58,6 +58,7 @@ export default function App() {
   });
   return (
     <View style={styles.container}>
+      <StatusBar style="black" />
       <View style={styles.city}>
         <Text style={styles.cityName}>{city}</Text>
       </View>
@@ -94,17 +95,17 @@ export default function App() {
                   {parseFloat(day.temp.day).toFixed(1)}
                 </Text>
                 <Fontisto
-                  name={day.weather[0].main}
+                  name={icons[day.weather[0].main]}
                   size={68}
-                  color="#e1b12c"
+                  color="#dcdde1"
                 />
               </View>
               <Text style={styles.nightTemp}>
                 Night({parseFloat(day.feels_like.night).toFixed(1)})
               </Text>
-              <Text style={styles.description}>{day.weather[0].main}</Text>
-              <Text style={styles.tinyText}>
-                -{day.weather[0].description}-
+              {/* <Text style={styles.description}>{day.weather[0].main}</Text> */}
+              <Text style={styles.description}>
+                {day.weather[0].description.slice(-2)}
               </Text>
             </View>
           ))
@@ -117,15 +118,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#e1b12c",
-  },
-  dateInfo: {
-    marginTop: 20,
-    flex: 0.3,
-    fontSize: 56,
-    marginBottom: 0,
-    color: "#e1b12c",
-    fontWeight: "800",
+    backgroundColor: "#75C2F6",
   },
   city: {
     flex: 0.3,
@@ -133,34 +126,45 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cityName: {
-    color: "#fbc531",
+    color: "#353b48",
     fontSize: 58,
     fontWeight: "600",
     marginTop: 30,
   },
   weather: {
-    backgroundColor: "#fbc531",
+    backgroundColor: "#75C2F6",
   },
   day: {
     width: SCREEN_WIDTH,
+    paddingHorizontal: 20,
+  },
+  dateInfo: {
+    marginTop: 20,
+    flex: 0.3,
+    justifyContent: "center",
     alignItems: "center",
+    fontSize: 56,
+    marginBottom: 0,
+    color: "#1D5D9B",
+    fontWeight: "800",
   },
   temp: {
-    color: "#2f3640",
+    color: "#353b48",
     marginTop: 0,
-    fontSize: 178,
+    fontSize: 138,
+    fontWeight: "300",
   },
   nightTemp: {
-    color: "#273c75",
+    color: "#1D5D9B",
     fontSize: 25,
-    fontWeight: "200",
+    fontWeight: "800",
     marginTop: -20,
   },
   description: {
     color: "#353b48",
     marginTop: 0,
     fontSize: 50,
-    fontWeight: "300",
+    fontWeight: "400",
   },
   tinyText: {
     color: "#273c75",
